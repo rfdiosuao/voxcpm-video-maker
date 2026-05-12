@@ -26,6 +26,63 @@ npm install
 npm run dev
 ```
 
+## External Inspiration: react-bits
+
+[react-bits](https://github.com/DavidHDev/react-bits) is a large collection of animated React components (90+ components). While these are React-based and cannot be used directly in HyperFrames, they serve as excellent **visual inspiration** for:
+
+- **Background effects**: Aurora, particles, gradients, mesh gradients
+- **Text animations**: Split text, scramble, typewriter, reveal effects
+- **UI animations**: Card entrances, stagger effects, hover states
+- **3D effects**: Rotating elements, perspective transforms, depth layers
+
+### How to use react-bits as inspiration
+
+1. **Browse** [reactbits.dev](https://reactbits.dev/) for visual ideas
+2. **Extract** the core animation concept (timing, easing, visual pattern)
+3. **Recreate** using GSAP `fromTo()` or Anime.js in HyperFrames HTML
+4. **Simplify** for video: remove interactivity, fix random values, ensure determinism
+
+### Example: Aurora Background
+
+react-bits has an Aurora component with flowing gradient waves. To recreate in HyperFrames:
+
+```html
+<!-- Simplified Aurora-inspired background -->
+<div class="aurora-bg">
+  <div class="wave wave-1"></div>
+  <div class="wave wave-2"></div>
+  <div class="wave wave-3"></div>
+</div>
+<style>
+  .aurora-bg { position: absolute; inset: 0; overflow: hidden; }
+  .wave {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    border-radius: 40%;
+    opacity: 0.3;
+  }
+  .wave-1 { background: radial-gradient(circle, #667eea 0%, transparent 70%); top: -50%; left: -50%; }
+  .wave-2 { background: radial-gradient(circle, #764ba2 0%, transparent 70%); top: -30%; left: -30%; }
+  .wave-3 { background: radial-gradient(circle, #00d4ff 0%, transparent 70%); top: -40%; left: -40%; }
+</style>
+<script>
+  const tl = gsap.timeline({ paused: true });
+  tl.to(".wave-1", { rotation: 360, duration: 20, ease: "none" })
+    .to(".wave-2", { rotation: -360, duration: 25, ease: "none" }, 0)
+    .to(".wave-3", { rotation: 180, duration: 30, ease: "none" }, 0);
+  window.__timelines["aurora-bg"] = tl;
+</script>
+```
+
+### Key adaptation rules
+
+- **No React**: Convert all React components to plain HTML + CSS + GSAP/Anime.js
+- **No interactivity**: Remove mouse, scroll, click handlers
+- **Deterministic**: Replace random values with fixed seeds or pre-calculated values
+- **Seekable**: Ensure animations work correctly when seeked to any point in time
+- **Performance**: Keep particle counts and DOM elements reasonable for video rendering
+
 ## Recommended Assets By Scene
 
 | Scene need | Local example | Why it works |
