@@ -8,6 +8,17 @@
 
 ---
 
+## 成功案例
+
+| 视频预览 | 生成结果 |
+|:--------:|:--------:|
+| [![视频演示](https://github.com/rfdiosuao/voxcpm-video-maker/raw/master/assets/daily_20260513.mp4)](https://github.com/rfdiosuao/voxcpm-video-maker/blob/master/assets/daily_20260513.mp4) | ![生成结果截图](https://github.com/rfdiosuao/voxcpm-video-maker/raw/master/assets/success-screenshot.png) |
+| **时长**: 47.72 秒 · **分辨率**: 1920×1080 · **大小**: 3.1 MB | **音画同步**: ✅ 差值 0.04s · **黑屏检测**: ✅ 无异常 |
+
+> 以上视频由 Trae SOLO 全自动生成，从脚本撰写到最终渲染全程无需人工干预。
+
+---
+
 ## 功能特性
 
 | 功能 | 说明 |
