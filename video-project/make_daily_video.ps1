@@ -18,6 +18,10 @@ if (-not (Test-Path $FfmpegPath)) { $FfmpegPath = "ffmpeg"; $FfprobePath = "ffpr
 # 确保 node 在 PATH 中
 $env:PATH = "$NodeDir;$env:PATH"
 
+# 创建统一输出目录
+$OutputRoot = "$VideoProject\output"
+if (-not (Test-Path $OutputRoot)) { New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null }
+
 function Run-Hyperframes {
     param([string[]]$Args)
     & D:\编程工具\node.js\node.exe $HyperframesCli @Args
@@ -318,16 +322,31 @@ if (Test-Path $horizontalFile) {
 
 # ========== 完成 ==========
 $outputFile = "$DailyDir\daily_$Date.mp4"
+$verticalFile = "$DailyDir\daily_${Date}_vertical.mp4"
 if (Test-Path $outputFile) {
+    # 复制到统一输出目录
+    Copy-Item $outputFile -Destination "$OutputRoot\daily_$Date.mp4" -Force
+    if (Test-Path $verticalFile) {
+        Copy-Item $verticalFile -Destination "$OutputRoot\daily_${Date}_vertical.mp4" -Force
+    }
+
     Write-Host "`n========================================" -ForegroundColor Cyan
     Write-Host "  视频制作完成！" -ForegroundColor Green
-    Write-Host "  输出: $outputFile" -ForegroundColor Green
+    Write-Host "  项目目录: $outputFile" -ForegroundColor Green
+    Write-Host "  统一输出: $OutputRoot\daily_$Date.mp4" -ForegroundColor Green
+    if (Test-Path $verticalFile) {
+        Write-Host "  竖屏输出: $OutputRoot\daily_${Date}_vertical.mp4" -ForegroundColor Green
+    }
     Write-Host "========================================" -ForegroundColor Cyan
     exit 0
 } elseif (Test-Path "$DailyDir\daily_${Date}_draft.mp4") {
+    # 复制draft到统一输出目录
+    Copy-Item "$DailyDir\daily_${Date}_draft.mp4" -Destination "$OutputRoot\daily_${Date}_draft.mp4" -Force
+
     Write-Host "`n========================================" -ForegroundColor Yellow
     Write-Host "  仅Draft版本可用" -ForegroundColor Yellow
-    Write-Host "  输出: $DailyDir\daily_${Date}_draft.mp4" -ForegroundColor Yellow
+    Write-Host "  项目目录: $DailyDir\daily_${Date}_draft.mp4" -ForegroundColor Yellow
+    Write-Host "  统一输出: $OutputRoot\daily_${Date}_draft.mp4" -ForegroundColor Yellow
     Write-Host "========================================" -ForegroundColor Yellow
     exit 0
 } else {
