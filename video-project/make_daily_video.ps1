@@ -34,7 +34,7 @@ $Styles = @(
     @{ name="Deep Space";      primary="#4f46e5"; secondary="#7c3aed"; accent="#22d3ee"; bg="#050510"; label="星际简报" },
     @{ name="Command Center";  primary="#10b981"; secondary="#059669"; accent="#34d399"; bg="#0a0f0a"; label="指挥中心" },
     @{ name="Magazine Motion"; primary="#f59e0b"; secondary="#d97706"; accent="#fbbf24"; bg="#0f0a0a"; label="杂志动态" },
-    @{ name="Neon Dataflow";   primary="#ec4899"; secondary="#db2777"; accent="#f472b6"; bg="#0f0a0f"; label="霓虹数据" },
+    @{ name="Neon Dataflow";   primary="#ec4899"; secondary="#db2777"; accent="#f472b6"; bg="#0f0a0a"; label="霓虹数据" },
     @{ name="Signal Radar";    primary="#667eea"; secondary="#764ba2"; accent="#00d4ff"; bg="#0a0a0f"; label="雷达扫描" },
     @{ name="Deep Space";      primary="#4f46e5"; secondary="#7c3aed"; accent="#22d3ee"; bg="#050510"; label="星际简报" }
 )
@@ -98,7 +98,7 @@ $endings = @(
     "好了，以上就是今天全部的AI资讯内容。感谢您的收看，我们明天同一时间，再见！",
     "今天的AI热点就分享到这里。喜欢内容别忘了点赞关注，明天继续为你带来最新鲜的行业资讯，拜拜！",
     "今日AI资讯播报完毕。感谢陪伴，我们明天再会，记得关注获取每日AI最新动态哦！",
-    "这就是今天的四条精选AI新闻。感谢收看，明天同一时间，我们继续解读AI行业新动态，再见啦！"
+    "这就是今天的十条精选AI新闻。感谢收看，明天同一时间，我们继续解读AI行业新动态，再见啦！"
 )
 $ending = $endings[(Get-Random) % $endings.Count]
 
@@ -142,7 +142,7 @@ try {
     $audioDuration = 90.0
 }
 
-# 分配时长: intro 8s + 4条新闻 + outro 8s
+# 分配时长: intro 8s + 10条新闻 + outro 8s
 $introDuration = 8.0
 $outroDuration = 8.0
 $newsCount = $newsItems.Count
