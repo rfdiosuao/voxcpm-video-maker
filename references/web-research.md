@@ -44,15 +44,18 @@ For a product video, run searches like:
 <product category> product photo
 ```
 
-For Chinese products, search both Chinese and English terms:
+For Chinese products, search both Chinese pinyin and English terms:
 
 ```text
-Lumi U盘启动器
-Lumi 启动器 官网
-U盘启动器 竞品
-U盘启动盘 制作工具 对比
-USB boot creator competitor
-bootable USB creator Windows
+<product-name-in-chinese-or-pinyin> official website / guanwang
+<product-name-in-chinese-or-pinyin> features / gongneng
+<product-name-in-chinese-or-pinyin> screenshots / jietu
+<category-in-chinese-or-pinyin> competitors / jingpin
+<category-in-chinese-or-pinyin> comparison / duibi
+<category-in-chinese-or-pinyin> user pain points / tongdian
+<category-in-chinese-or-pinyin> channel partner reseller / zhaoshang daili
+<product category> competitor
+<product category> review comparison
 ```
 
 ## Source Log

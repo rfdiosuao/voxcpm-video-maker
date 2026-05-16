@@ -6,12 +6,12 @@ description: >
   "AI news video", "VoxCPM voiceover", "HyperFrames render", "black screen video",
   "audio video out of sync", "yin hua bu tong bu", "cool visual assets",
   "Anime.js effects", "avoid repetitive videos", "product promo short video",
-  "9:16 vertical video", "source招商", "competitor research", "web素材",
+  "9:16 vertical video", "partner/channel promo", "competitor research", "web assets",
   or "debug a generated MP4".
   It covers AI HOT news collection, VoxCPM narration generation, HyperFrames composition
   authoring, required web research, competitor scans, web image/video material sourcing,
-  Anime.js visual asset integration, audio/video sync, visual variation, local rendering,
-  QA, and black-screen debugging.
+  Anime.js visual asset integration, premium art direction, audio/video sync,
+  visual variation, local rendering, QA, and black-screen debugging.
 ---
 
 # VoxCPM Video Maker
@@ -41,11 +41,13 @@ Use these paths as the canonical local environment:
 5. Write a short narration script with scene blocks.
 6. Generate VoxCPM narration locally.
 7. Measure narration duration and create a timing plan before writing scene HTML.
-8. Pick a visual concept that differs from recent outputs.
-9. Build or update a HyperFrames project under `daily\YYYYMMDD` or a product-specific folder.
-10. Add scenes and approved web/local/Anime.js assets.
-11. Run `npx hyperframes lint`, `validate`, and `inspect`.
-12. Render a draft MP4, test sync/black frames/sample frames, then render standard/high quality.
+8. Build a visual direction using `references/art-direction.md`.
+9. Pick a visual concept that differs from recent outputs.
+10. Build or update a HyperFrames project under `daily\YYYYMMDD` or a product-specific folder.
+11. Add scenes and approved web/local/Anime.js assets.
+12. Run `npx hyperframes lint`, `validate`, and `inspect`.
+13. Render a draft MP4, test sync/black frames/sample frames, then render standard/high quality.
+14. Run an aesthetic review on extracted frames; revise if the video looks cheap, generic, or PPT-like.
 
 ## Mandatory Web Research
 
@@ -56,7 +58,7 @@ Use web research for:
 - official product facts and screenshots
 - competitor feature scans
 - market/category language
-- source招商 or channel-partner positioning
+- partner, reseller, channel, or business-opportunity positioning
 - visual references from official sites, product pages, app stores, docs, press pages, and reputable reviews
 - royalty-free or permission-safe image/video candidates
 
@@ -80,9 +82,9 @@ Assets rejected:
 
 If network access fails, state that research could not be completed and stop before making competitive claims.
 
-## Product Promo /招商 Shorts
+## Product Promo / Partner Shorts
 
-For product videos such as a 9:16 vertical short for "Lumi U盘启动器", read `references/product-short.md`.
+For product, feature-introduction, launch, website, channel, reseller, or business-opportunity shorts, read `references/product-short.md`.
 
 Default product short requirements:
 
@@ -91,8 +93,8 @@ Default product short requirements:
 - Aim for about 55-70 seconds.
 - Use a premium launch-film direction: Apple keynote clarity, Google I/O energy, Bloomberg-style data visualization.
 - Avoid PPT-like slide decks, cheap templates, generic stock backgrounds, and repetitive card-only layouts.
-- Show product function, proof, competitor contrast, and招商/business opportunity.
-- End with a clear partner/channel/source招商 message.
+- Show product function, proof, competitor contrast, and the business opportunity when relevant.
+- End with a clear CTA for the intended audience: buyer, user, partner, channel, reseller, or website lead.
 
 For AI HOT data, use:
 
@@ -177,6 +179,38 @@ Vary at least three dimensions per video:
 - story structure
 
 Do not reuse the same `daily-intro` + identical news-card layout + identical outro for consecutive videos unless the user explicitly asks for a fixed template.
+
+## Art Direction Gate
+
+Treat aesthetics as a release blocker. Read `references/art-direction.md` before building product promos, 9:16 shorts, website videos, or any video where the user asks for premium quality.
+
+Before writing HTML, create:
+
+```text
+visual-direction.md
+moodboard-notes.md
+keyframes-plan.md
+```
+
+Every video must define:
+
+- one clear art-direction route
+- 3-5 external visual references found through web research
+- typography system
+- layout grid
+- motion language
+- color palette
+- forbidden looks
+- hero frames for intro, middle, and CTA
+
+Reject outputs that look like:
+
+- a dark PPT deck with animated cards
+- generic neon tech template
+- random stock background behind text
+- dense unreadable dashboard
+- low-contrast gray text on black
+- repeated centered title + bullet list scenes
 
 ## Composition Rules
 
@@ -319,8 +353,9 @@ Copy-Item -LiteralPath $outputWav -Destination "$dailyNarrationDir\daily_$Date.w
 ## Reference Files
 
 - `references/assets.md` - Cool Anime.js and HyperFrames visual asset patterns.
+- `references/art-direction.md` - Premium visual direction, moodboard, composition, and aesthetic QA.
 - `references/web-research.md` - Required real web research, competitor scan, and source logging.
-- `references/product-short.md` - 9:16 product promo and source招商 short-video workflow.
+- `references/product-short.md` - 9:16 product promo, feature-introduction, partner, and channel short-video workflow.
 - `references/sync.md` - Audio/video timing, scene allocation, and sync QA.
 - `references/variation.md` - Non-repetitive visual direction and variation system.
 - `references/black-screen-debug.md` - Reproducible black-screen diagnosis and repair workflow.

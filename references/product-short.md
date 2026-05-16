@@ -1,6 +1,6 @@
-# Product Promo And 招商 Short Video
+# Product Promo And Partner Short Video
 
-Use this reference for product/function/招商 videos, especially 9:16 vertical shorts for Douyin, Xiaohongshu, WeChat Channels, websites, or landing pages.
+Use this reference for product, feature-introduction, launch, channel, reseller, source-supplier, business-opportunity, website, Douyin, Xiaohongshu, or WeChat Channels videos. Keep the workflow reusable for any product; do not bake one specific product prompt into the skill.
 
 ## Default Format
 
@@ -28,6 +28,7 @@ Avoid:
 - Generic stock tech tunnels.
 - Endless bullet lists.
 - Claims without sources.
+- Product-specific examples that are not requested by the current user.
 
 ## Mandatory Inputs
 
@@ -35,9 +36,10 @@ Before scripting:
 
 1. Run `web-research.md`.
 2. Build `source-log.md`.
-3. Build a competitor matrix.
-4. Decide what can be shown visually: official screenshots, product UI, generated device mockups, data visualization, workflow diagrams.
-5. Decide the招商 offer: source supplier, channel partner, regional agent, reseller, OEM/customization, private traffic conversion, or website lead capture.
+3. Build a competitor matrix based on the current product category.
+4. Run `art-direction.md` and create `visual-direction.md`, `moodboard-notes.md`, and `keyframes-plan.md`.
+5. Decide what can be shown visually: official screenshots, product UI, generated device mockups, data visualization, workflow diagrams, real photos, or permission-safe web assets.
+6. Decide the CTA type: purchase, signup, demo, website visit, channel partner, reseller, regional agent, OEM/customization, source-supplier cooperation, or private-traffic conversion.
 
 ## One-Minute Structure
 
@@ -45,66 +47,57 @@ Use this as a starting point, then adjust to measured narration duration:
 
 | Time | Beat | Purpose |
 | --- | --- | --- |
-| 0-4s | Hook | Name the problem and product category |
-| 4-12s | Product reveal | Show Lumi U盘启动器 as the solution |
+| 0-4s | Hook | Name the user problem and category tension |
+| 4-12s | Product reveal | Introduce the product as the solution |
 | 12-28s | Core functions | Explain 3-4 highest-value functions |
-| 28-40s | Competitor contrast | Show a sourced comparison, not a vague attack |
-| 40-52s | Business opportunity | Explain招商 logic, margin/traffic/scenario potential if sourced |
-| 52-65s | CTA | Invite partners, show website/contact/next step |
+| 28-40s | Competitor/category contrast | Show sourced differences, not vague attacks |
+| 40-52s | Business or adoption logic | Explain why the product is worth buying, using, or partnering around |
+| 52-65s | CTA | Invite the intended next action |
 
 For a 9:16 video, keep each scene visually simple but layered. Use one strong focal point per beat.
 
-## Lumi U盘启动器 Example Direction
+## Research Pattern
 
-For the prompt "Lumi U盘启动器":
-
-Research first:
+Build the research plan from the user's product and category:
 
 ```text
-Lumi U盘启动器 官网
-Lumi U盘启动器 功能
-Lumi启动器
-U盘启动器 竞品
-U盘启动盘制作工具
-微PE 工具箱
-Ventoy
-Rufus
-老毛桃 U盘启动
-大白菜 U盘启动
-USB boot creator Windows
+<product name> official website
+<product name> features
+<product name> screenshots
+<product name> pricing/download/demo
+<product category> competitors
+<competitor name> official features
+<product category> review comparison
+<product category> user pain points
+<product category> market demand
+<product category> royalty free video
+<product category> product photo
 ```
 
-Likely competitor buckets to verify:
+For Chinese products, search both Chinese pinyin and English variants:
 
-- Ventoy
-- Rufus
-- 微PE工具箱
-- 老毛桃
-- 大白菜
-- UltraISO or similar ISO/USB tools
+```text
+<product-name-in-chinese-or-pinyin> official website / guanwang
+<product-name-in-chinese-or-pinyin> features / gongneng
+<product-name-in-chinese-or-pinyin> screenshots / jietu
+<product-name-in-chinese-or-pinyin> download pricing demo
+<category-in-chinese-or-pinyin> competitors / jingpin
+<category-in-chinese-or-pinyin> comparison / duibi
+<category-in-chinese-or-pinyin> user pain points / tongdian
+<category-in-chinese-or-pinyin> channel partner reseller / zhaoshang daili
+<product category> competitor
+<product category> review comparison
+```
 
 Do not assume feature advantages. Verify them through sources.
-
-Potential function categories to scan:
-
-- U盘启动盘制作
-- 多系统/多镜像支持
-- PE维护环境
-- 驱动/工具箱
-- 数据安全/无损制作
-- 新手一键操作
-- BIOS/UEFI兼容
-- Windows安装/系统修复
-- 商业授权/渠道合作
-- 官网/客户转化/招商政策
 
 ## Visual System For Premium 9:16
 
 Use a vertical launch-film layout:
 
-- Full-height black or near-black stage.
-- Product name as first-screen signal.
-- USB/device silhouette or generated product object.
+- Full-height stage with controlled contrast.
+- Product name or object as first-screen signal.
+- Real UI, product object, generated device mockup, or category-specific hero visual.
 - Thin data lines and precise labels.
 - Big typographic claims, one per scene.
 - Animated comparison matrix with sourced feature cells.
@@ -114,10 +107,10 @@ Use a vertical launch-film layout:
 Recommended visual route:
 
 ```text
-Route: Neon Dataflow + Command Center
-Hero asset: svg-line-drawing or layered-css-transforms
-Supporting asset: svg-graph / auto-layout-code / subtle particles
-Palette: black, white, Lumi accent color if found, cyan/blue data accent
+Route: Product Launch + Data Proof
+Hero asset: product screenshot/object/mockup/category visual
+Supporting asset: data map / comparison matrix / workflow diagram / subtle particles
+Palette: product brand colors if verified, plus restrained neutral and data accent colors
 ```
 
 ## Script Rules
@@ -125,41 +118,42 @@ Palette: black, white, Lumi accent color if found, cyan/blue data accent
 Use concrete language:
 
 ```text
-不是“功能强大”
-而是“一次制作，多场景维护；系统安装、启动修复、工具箱集成，一支 U 盘完成”
+Do not say: "This product is powerful."
+Say: "It solves <specific workflow> by combining <feature A>, <feature B>, and <feature C> in one flow."
 ```
 
-For competitor contrast:
+For competitor or category contrast:
 
 ```text
-市面上的工具，有的更偏镜像写入，有的更偏PE维护。
-Lumi要讲清楚自己的优势：更完整的启动场景、更低的新手门槛、更适合渠道交付。
+Some tools focus on <competitor strength A>; others focus on <competitor strength B>.
+This product should be positioned around <verified advantage or differentiated workflow>.
 ```
 
-Only say "更强" or "更优秀" after evidence supports the feature. If evidence is incomplete, say:
+Only say "stronger", "better", "more complete", or "more suitable" after evidence supports the feature. If evidence is incomplete, use safer phrasing:
 
 ```text
-Lumi 的表达重点应放在...
-Lumi 可以被包装成...
-从招商角度，更适合强调...
+The stronger positioning appears to be...
+The product can be packaged as...
+From a channel/business perspective, emphasize...
 ```
 
-## 招商 Message
+## Partner Or Business CTA
 
-The final 10-15 seconds must answer:
+Use this section only when the user brief asks for partner recruitment, source-supplier positioning, channel sales, reseller conversion, zhaoshang, agency, or business-opportunity messaging.
 
-- Who should join?
-- What can they sell or promote?
+The final 10-15 seconds should answer:
+
+- Who should join or take action?
+- What can they sell, promote, implement, or resell?
 - Why does the category have demand?
 - What is the next step?
 
-Example CTA shape:
+Generic CTA shape:
 
 ```text
-如果你有电脑维修、系统安装、数码门店、企业运维或本地服务流量，
-Lumi U盘启动器不是一个普通工具，
-而是一套可以复制交付的启动解决方案。
-现在，开放源头招商。
+If you serve <target customer group> and already have <traffic/channel/scenario>,
+this product can be packaged as <deliverable solution>, not just a standalone tool.
+The next step is <website/contact/demo/consultation/channel application>.
 ```
 
 ## Required Deliverables
@@ -170,6 +164,8 @@ For product promo projects, create:
 source-log.md
 competitor-matrix.md
 visual-direction.md
+moodboard-notes.md
+keyframes-plan.md
 script.txt
 timing-plan.md
 index.html
@@ -184,4 +180,4 @@ Render QA:
 - `inspect` passes.
 - Audio/video duration diff <= 0.2s.
 - `blackdetect` has no long black segments.
-- Sample frames show product, functions, comparison, and招商 CTA.
+- Sample frames show product, functions, proof/comparison, and the requested CTA.

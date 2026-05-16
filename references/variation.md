@@ -2,6 +2,8 @@
 
 Use this reference when making a new AI HOT/VoxCPM video so the result does not look like a clone of prior outputs.
 
+For premium videos, read `art-direction.md` first. Variation is not enough by itself; the video also needs strong composition, hierarchy, and visual references.
+
 ## Principle
 
 Keep the brand recognizable, but vary the visual grammar. Reuse the workflow, not the same composition.
