@@ -1,4 +1,4 @@
-# AI资讯视频制作 - 完整链路脚本
+﻿# AI资讯视频制作 - 完整链路脚本
 # 修复版：使用 Python 生成 HTML，增加多重完整性检查，避免黑屏问题
 param([string]$Date = (Get-Date).ToString("yyyyMMdd"))
 
