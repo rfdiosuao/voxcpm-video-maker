@@ -1,6 +1,6 @@
 {
   "openai_api_key": "sk-ACn9XX9Uw7AIKKbylwScs8A2Dj1tjtS1SDxAWIUWPNBpg4Ya",
   "openai_base_url": "https://api.heang.top/v1",
-  "model": "gpt-4o",
+  "model": "glm-5",
   "timeout": 120
 }
