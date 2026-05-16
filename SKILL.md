@@ -34,9 +34,34 @@ Use these paths as the canonical local environment:
 
 ## Core Workflow
 
+### For Daily AI HOT News Videos (Fully Automated)
+
+When the user asks for "today's AI news video", "make daily AI HOT", "generate today's video", or similar:
+
+1. **Directly run the fully automated one-click script**:
+   ```powershell
+   cd D:\VoxCPM\VoxCPM-2.0.3\video-project
+   .\make_daily_video.ps1
+   ```
+2. The script handles **everything end-to-end**:
+   - Fetches 10 AI HOT news items automatically
+   - Writes a natural narration script with random openings/closings
+   - Generates VoxCPM narration locally
+   - Measures audio duration and allocates scene timing
+   - Generates HTML compositions (AI dynamic layout if `ai_config.json` is configured, else fallback to template)
+   - Playwright automatically captures screenshots for all news with retry
+   - Runs HyperFrames lint and validation
+   - Renders video with automatic retry and black screen detection
+   - Copies final MP4 to unified output folder `D:\VoxCPM\VoxCPM-2.0.3\video-project\output\`
+   - Generates vertical 9:16 version if horizontal succeeds
+3. After script completes, report the output location and confirm success.
+4. Do **NOT** manually repeat steps that the script already automates.
+
+### For Custom Product/Promo Videos (Manual)
+
 1. Run real web research for the product/news/topic, competitors, and usable visual references.
 2. Save a source log with URLs, dates, claims, and asset candidates.
-3. Fetch AI HOT items when the video is an AI news video.
+3. Fetch AI HOT items when the video contains AI news.
 4. Select the strongest claims or product selling points.
 5. Write a short narration script with scene blocks.
 6. Generate VoxCPM narration locally.
@@ -79,6 +104,8 @@ Visual asset candidates:
 Assets used:
 Assets rejected:
 ```
+
+**Exception for Daily AI HOT News:** The `make_daily_video.ps1` script already fetches AI HOT items and captures screenshots automatically. You don't need to manually create a source log for fully automated daily news.
 
 If network access fails, state that research could not be completed and stop before making competitive claims.
 
