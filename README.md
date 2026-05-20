@@ -246,6 +246,7 @@ npx hyperframes render --output final.mp4 --fps 30 --quality standard
 | [references/assets.md](references/assets.md) | Anime.js 视觉资产映射与适配指南 |
 | [references/web-research.md](references/web-research.md) | 网络调研、竞品扫描、source 日志规范 |
 | [references/product-short.md](references/product-short.md) | 9:16 竖屏产品推广短视频工作流 |
+| [references/preflight-tutorial.md](references/preflight-tutorial.md) | 两个 Skill 的前置条件、目录摆放和验通步骤 |
 | [references/sync.md](references/sync.md) | 音画同步、场景时间分配、QA 流程 |
 | [references/variation.md](references/variation.md) | 视觉变化系统与非重复性设计 |
 | [references/black-screen-debug.md](references/black-screen-debug.md) | 黑屏诊断与修复工作流 |
