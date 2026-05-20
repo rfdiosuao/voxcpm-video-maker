@@ -18,13 +18,13 @@ INTRO_TEMPLATE = '''<!DOCTYPE html>
   <meta charset="UTF-8">
   <style>
     * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-    body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: {bg}; color: #fff; overflow: hidden; }}
+    body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #121a2f; color: #fff; overflow: hidden; }}
     .scene-content {{ width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }}
-    .bg-gradient {{ position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba({p_r}{p_g}{p_b},0.15) 0%, transparent 60%), linear-gradient(180deg, {bg} 0%, #111118 100%); z-index: 0; }}
+    .bg-gradient {{ position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba({p_r},{p_g},{p_b},0.28) 0%, transparent 58%), linear-gradient(180deg, #17213a 0%, #101827 100%); z-index: 0; }}
     .grid-lines {{ position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px; z-index: 1; }}
     .glow-orb {{ position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; }}
-    .glow-orb-1 {{ width: 400px; height: 400px; background: rgba({p_r}{p_g}{p_b},0.25); top: -100px; right: 100px; }}
-    .glow-orb-2 {{ width: 300px; height: 300px; background: rgba({s_r}{s_g}{s_b},0.2); bottom: -50px; left: 150px; }}
+    .glow-orb-1 {{ width: 400px; height: 400px; background: rgba({p_r},{p_g},{p_b},0.25); top: -100px; right: 100px; }}
+    .glow-orb-2 {{ width: 300px; height: 300px; background: rgba({s_r},{s_g},{s_b},0.2); bottom: -50px; left: 150px; }}
     .intro-container {{ position: relative; z-index: 10; text-align: center; }}
     .date-badge {{ font-size: 20px; color: rgba(132,150,255,0.9); letter-spacing: 4px; margin-bottom: 24px; }}
     .main-title {{ font-size: 100px; font-weight: 800; background: linear-gradient(135deg, #fff 0%, #c7d2fe 52%, #8ea2ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 20px; }}
@@ -56,8 +56,7 @@ INTRO_TEMPLATE = '''<!DOCTYPE html>
     window.__timelines = window.__timelines || {{}};
     const totalDuration = {intro_duration};
     const tl = gsap.timeline({{ paused: true }});
-    tl.fromTo(".bg-gradient", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.8, ease: "power2.out" }}, 0)
-      .fromTo(".glow-orb-1", {{ scale: 0.88, opacity: 0 }}, {{ scale: 1, opacity: 1, duration: 1.2, ease: "power3.out" }}, 0.2)
+    tl.fromTo(".glow-orb-1", {{ scale: 0.88, opacity: 0.65 }}, {{ scale: 1, opacity: 1, duration: 1.2, ease: "power3.out" }}, 0)
       .fromTo(".glow-orb-2", {{ scale: 0.88, opacity: 0 }}, {{ scale: 1, opacity: 1, duration: 1.2, ease: "power3.out" }}, 0.4)
       .fromTo(".grid-lines", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.8, ease: "power2.out" }}, 0.6)
       .fromTo(".date-badge", {{ y: 30, opacity: 0 }}, {{ y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }}, 0.8)
@@ -79,10 +78,12 @@ OUTRO_TEMPLATE = '''<!DOCTYPE html>
   <meta charset="UTF-8">
   <style>
     * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-    body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #0a0a0f; color: #fff; overflow: hidden; }}
+    body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #121a2f; color: #fff; overflow: hidden; }}
     .scene-content {{ width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }}
-    .bg-gradient {{ position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 100%, rgba({p_r}{p_g}{p_b},0.12) 0%, transparent 60%), linear-gradient(180deg, #111118 0%, {bg} 100%); z-index: 0; }}
-    .grid-lines {{ position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px; z-index: 1; }}
+    .bg-gradient {{ position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 92%, rgba({p_r},{p_g},{p_b},0.42) 0%, rgba({p_r},{p_g},{p_b},0.12) 42%, transparent 68%), linear-gradient(180deg, #17213a 0%, #101827 100%); z-index: 0; }}
+    .grid-lines {{ position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 60px 60px; z-index: 1; }}
+    .signal-band {{ position: absolute; left: -12%; right: -12%; bottom: 18%; height: 220px; background: linear-gradient(90deg, transparent 0%, rgba({p_r},{p_g},{p_b},0.34) 35%, rgba(255,255,255,0.14) 50%, rgba({p_r},{p_g},{p_b},0.26) 65%, transparent 100%); filter: blur(5px); transform: rotate(-8deg); z-index: 2; }}
+    .signal-pulse {{ position: absolute; width: 680px; height: 680px; border-radius: 50%; border: 2px solid rgba({p_r},{p_g},{p_b},0.32); box-shadow: 0 0 80px rgba({p_r},{p_g},{p_b},0.18); z-index: 2; }}
     .outro-container {{ position: relative; z-index: 10; text-align: center; }}
     .main-title {{ font-size: 72px; font-weight: 800; background: linear-gradient(135deg, #fff 0%, #c7d2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 24px; }}
     .subtitle {{ font-size: 32px; color: rgba(255,255,255,0.7); font-weight: 300; margin-bottom: 40px; }}
@@ -96,6 +97,8 @@ OUTRO_TEMPLATE = '''<!DOCTYPE html>
     <div class="scene-content">
       <div class="bg-gradient"></div>
       <div class="grid-lines"></div>
+      <div class="signal-band"></div>
+      <div class="signal-pulse"></div>
       <div class="outro-container">
         <div class="divider"></div>
         <h1 class="main-title">明天同一时间</h1>
@@ -111,7 +114,8 @@ OUTRO_TEMPLATE = '''<!DOCTYPE html>
     window.__timelines = window.__timelines || {{}};
     const totalDuration = {outro_duration};
     const tl = gsap.timeline({{ paused: true }});
-    tl.fromTo(".bg-gradient", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.8, ease: "power2.out" }}, 0)
+    tl.fromTo(".signal-pulse", {{ scale: 0.92, opacity: 0.55 }}, {{ scale: 1.04, opacity: 0.95, duration: totalDuration, ease: "sine.inOut" }}, 0)
+      .fromTo(".signal-band", {{ x: -80, opacity: 0.72 }}, {{ x: 80, opacity: 0.92, duration: totalDuration, ease: "sine.inOut" }}, 0)
       .fromTo(".divider", {{ scaleX: 0, opacity: 0 }}, {{ scaleX: 1, opacity: 1, duration: 0.6, ease: "power2.out" }}, 0.3)
       .fromTo(".main-title", {{ y: 50, opacity: 0 }}, {{ y: 0, opacity: 1, duration: 1, ease: "power3.out" }}, 0.6)
       .fromTo(".subtitle", {{ y: 30, opacity: 0 }}, {{ y: 0, opacity: 1, duration: 0.8, ease: "power2.out" }}, 1)
@@ -173,9 +177,9 @@ FALLBACK_NEWS_TEMPLATE = '''<!DOCTYPE html>
   <meta charset="UTF-8">
   <style>
     * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-    body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #0a0a0f; color: #fff; overflow: hidden; }}
+    body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #121a2f; color: #fff; overflow: hidden; }}
     .scene-content {{ width: 100%; height: 100%; padding: 60px 100px; display: flex; flex-direction: column; justify-content: center; position: relative; }}
-    .bg-gradient {{ position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba({accent_r}{accent_g}{accent_b},0.12) 0%, transparent 52%), radial-gradient(ellipse at 90% 20%, rgba({a_r}{a_g}{a_b},0.06) 0%, transparent 48%), linear-gradient(135deg, #0a0a0f 0%, #111118 100%); z-index: 0; }}
+    .bg-gradient {{ position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba({accent_r},{accent_g},{accent_b},0.22) 0%, transparent 52%), radial-gradient(ellipse at 90% 20%, rgba({a_r},{a_g},{a_b},0.14) 0%, transparent 48%), linear-gradient(135deg, #17213a 0%, #101827 58%, #151b2f 100%); z-index: 0; }}
     .accent-line {{ position: absolute; left: 0; top: 0; width: 6px; height: 100%; background: linear-gradient(180deg, {accent} 0%, {s} 50%, {a} 100%); z-index: 1; transform-origin: top; }}
     .news-container {{ position: relative; z-index: 10; max-width: 1720px; display: grid; grid-template-columns: 1fr 580px; gap: 48px; align-items: center; }}
     .news-text {{ }}
@@ -226,8 +230,7 @@ FALLBACK_NEWS_TEMPLATE = '''<!DOCTYPE html>
     window.__timelines = window.__timelines || {{}};
     const totalDuration = {duration};
     const tl = gsap.timeline({{ paused: true }});
-    tl.fromTo(".bg-gradient", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.6, ease: "power2.out" }}, 0)
-      .fromTo(".accent-line", {{ scaleY: 0, opacity: 0 }}, {{ scaleY: 1, opacity: 1, duration: 0.8, ease: "power3.out" }}, 0.2)
+    tl.fromTo(".accent-line", {{ scaleY: 0.04, opacity: 0.35 }}, {{ scaleY: 1, opacity: 1, duration: 0.8, ease: "power3.out" }}, 0)
       .fromTo(".news-number", {{ x: -44, opacity: 0 }}, {{ x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }}, 0.4)
       .fromTo(".news-title", {{ x: 44, opacity: 0 }}, {{ x: 0, opacity: 1, duration: 0.8, ease: "power3.out" }}, 0.5)
       .fromTo(".news-summary", {{ y: 30, opacity: 0 }}, {{ y: 0, opacity: 1, duration: 0.7, ease: "power2.out" }}, 0.7)
@@ -373,21 +376,62 @@ def main():
     # Load AI config
     ai_config = load_ai_config()
     if ai_config:
-        print(f"  ✓ 已加载 AI 配置，使用模型: {ai_config.get('model', 'gpt-4o')}")
+        print(f"  [OK] Loaded AI config, model: {ai_config.get('model', 'gpt-4o')}")
     else:
-        print(f"  ! 未找到 ai_config.json 或配置无效，将使用 fallback 模板")
+        print(f"  [WARN] No ai_config.json or invalid config, using fallback template")
 
     # Load style info and news items
-    with open(style_json_path, 'r', encoding='utf-8') as f:
+    with open(style_json_path, 'r', encoding='utf-8-sig') as f:
         data = json.load(f)
 
     news_items = data['news_items']
     style_name = data['style_name']
     style_label = data['style_label']
-    intro_duration = data['intro_duration']
-    outro_duration = data['outro_duration']
-    news_duration = data['news_duration']
-    total_duration = data['total_duration']
+
+    segments = data.get('segments') or []
+    if isinstance(segments, dict):
+        segments = [segments]
+    segment_by_id = {
+        str(segment.get('id')): segment
+        for segment in segments
+        if isinstance(segment, dict) and segment.get('id')
+    }
+
+    def get_segment_duration(segment_id, fallback):
+        segment = segment_by_id.get(segment_id)
+        if segment and segment.get('duration') is not None:
+            try:
+                return float(segment.get('duration'))
+            except (TypeError, ValueError):
+                pass
+        grouped_duration = 0.0
+        grouped_count = 0
+        for candidate in segments:
+            if not isinstance(candidate, dict):
+                continue
+            candidate_scene_id = str(candidate.get('scene_id') or candidate.get('id') or '')
+            if candidate_scene_id != segment_id:
+                continue
+            try:
+                grouped_duration += float(candidate.get('duration'))
+                grouped_count += 1
+            except (TypeError, ValueError):
+                continue
+        if grouped_count > 0:
+            return grouped_duration
+        return float(fallback)
+
+    default_news_duration = float(data.get('news_duration', 18.0))
+    intro_duration = get_segment_duration('intro', data.get('intro_duration', 8.0))
+    outro_duration = get_segment_duration('outro', data.get('outro_duration', 8.0))
+    news_durations = [
+        get_segment_duration(f'news-{i + 1}', default_news_duration)
+        for i in range(len(news_items))
+    ]
+    if segments:
+        total_duration = round(intro_duration + sum(news_durations) + outro_duration, 3)
+    else:
+        total_duration = float(data.get('total_duration', intro_duration + sum(news_durations) + outro_duration))
 
     # Convert colors
     p_r, p_g, p_b = hex_to_rgb(p_primary)
@@ -436,6 +480,7 @@ def main():
     for i, item in enumerate(news_items):
         num = i + 1
         num_str = f"{num:02d}"
+        scene_duration = news_durations[i]
         accent = accent_colors[i % len(accent_colors)]
         accent_r, accent_g, accent_b = hex_to_rgb(accent)
 
@@ -450,9 +495,23 @@ def main():
         has_image = os.path.exists(image_path) and os.path.getsize(image_path) > 10000
 
         # Try AI generation
-        ai_html = generate_ai_html(item, num, has_image, p_primary, s_secondary, a_accent, news_duration, ai_config)
+        ai_html = generate_ai_html(item, num, has_image, p_primary, s_secondary, a_accent, scene_duration, ai_config)
 
         if ai_html is not None:
+            # Post-process: verify and fix window.__timelines registration
+            timeline_key = f'window.__timelines["news-item-{num}"]'
+            if timeline_key not in ai_html:
+                fix_script = f'\n  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>\n  <script>\n    window.__timelines = window.__timelines || {{}};\n    const totalDuration = {scene_duration};\n    const tl = gsap.timeline({{ paused: true }});\n    tl.fromTo("[data-composition-id] > *", {{ opacity: 0 }}, {{ opacity: 1, duration: 1, stagger: 0.15, ease: "power2.out" }}, 0);\n    window.__timelines["news-item-{num}"] = tl;\n  </script>'
+                if '</script>' in ai_html:
+                    last_script = ai_html.rfind('</script>')
+                    ai_html = ai_html[:last_script + len('</script>')] + fix_script
+                else:
+                    ai_html = ai_html.rstrip()
+                    if ai_html.endswith('</html>'):
+                        ai_html = ai_html[:-len('</html>')] + fix_script + '\n</html>'
+                    else:
+                        ai_html += fix_script
+                print(f'  [新闻 {num}] Fixed: injected missing timeline registration')
             final_html = ai_html
             ai_success_count += 1
         else:
@@ -473,7 +532,7 @@ def main():
                 s=s_secondary,
                 a=a_accent,
                 a_r=a_r, a_g=a_g, a_b=a_b,
-                duration=news_duration
+                duration=scene_duration
             )
             fallback_count += 1
 
@@ -502,12 +561,13 @@ def main():
     scenes_html = ""
     for i in range(len(news_items)):
         num = i + 1
+        scene_duration = news_durations[i]
         scenes_html += INDEX_SCENE_ENTRY.format(
             num=num,
             start=current_start,
-            duration=news_duration
+            duration=scene_duration
         )
-        current_start += news_duration
+        current_start += scene_duration
 
     index_html = INDEX_TEMPLATE.format(
         total_duration=total_duration,
@@ -538,7 +598,7 @@ def main():
             sys.exit(1)
         else:
             size = os.path.getsize(f)
-            print(f"  ✓ {os.path.relpath(f, daily_dir)} - {size} bytes")
+            print(f"  [OK] {os.path.relpath(f, daily_dir)} - {size} bytes")
 
     print("\n[OK] All HTML files generated successfully")
 

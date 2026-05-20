@@ -1,4 +1,4 @@
-# VoxCPM Video Maker — 基于国产大模型的 AI 新闻视频全自动制作 Skill
+﻿# VoxCPM Video Maker — 基于国产大模型的 AI 新闻视频全自动制作 Skill
 
 > **参赛项目**: Trae SOLO 模式 Skill 创新大赛  
 > **项目名称**: VoxCPM Video Maker  
@@ -101,7 +101,6 @@ Trae SOLO 自主编写 HyperFrames HTML 场景文件，使用 GSAP 3.12 实现�
 
 ```powershell
 npx hyperframes lint      # 语法检查
-npx hyperframes validate  # 结构验证
 npx hyperframes inspect   # 资源检查
 ffmpeg blackdetect        # 黑屏检测
 ffprobe duration          # 时长验证
@@ -167,7 +166,7 @@ cd video-project
 - **多步骤任务编排**: 自主规划从资讯采集到视频渲染的完整工作流
 - **代码生成**: 自主编写 HTML、CSS、JavaScript 动画代码
 - **系统命令执行**: 自主调用 PowerShell、FFmpeg、HyperFrames CLI
-- **错误诊断与修复**: 自主执行 lint/validate/inspect 并修复问题
+- **错误诊断与修复**: 自主执行 lint/inspect/QA 并修复问题
 
 ### 2. 自动化视频生产
 
@@ -213,3 +212,4 @@ VoxCPM Video Maker 展示了国产大模型在**自动化内容生产**领域的
 <p align="center">
   Made with ❤️ by <a href="https://www.trae.ai/">Trae SOLO</a> · <a href="https://github.com/rfdiosuao/voxcpm-video-maker">VoxCPM Video Maker</a>
 </p>
+

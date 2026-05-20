@@ -92,16 +92,17 @@ Research date: YYYY-MM-DD
 
 ## Competitor Matrix
 
-For every product promo, create a simple matrix before writing the script:
+For every product promo, create a simple matrix before writing the script. Replace the rows with category-specific features discovered during research; do not reuse fields from an unrelated product category.
 
 ```markdown
 | Feature | Product | Competitor A | Competitor B | Evidence |
 | --- | --- | --- | --- | --- |
-| USB boot creation | yes | yes | yes | URLs |
-| Driver/PE/toolbox | ... | ... | ... | URLs |
-| One-click workflow | ... | ... | ... | URLs |
-| Data safety | ... | ... | ... | URLs |
-| Commercial/partner model | ... | ... | ... | URLs |
+| Primary user outcome | ... | ... | ... | URLs |
+| Core workflow supported | ... | ... | ... | URLs |
+| Setup/onboarding friction | ... | ... | ... | URLs |
+| Platform/device/ecosystem support | ... | ... | ... | URLs |
+| Pricing/licensing/business model | ... | ... | ... | URLs |
+| Trust, support, proof, or adoption signal | ... | ... | ... | URLs |
 ```
 
 Only make "better than competitors" claims when the matrix has evidence. Otherwise phrase as "positioned for", "designed to", or "focuses on".

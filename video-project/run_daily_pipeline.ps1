@@ -1,146 +1,173 @@
-﻿# 每日AI日报视频制作与发布 - 主控脚本
-# 功能: 预检 -> 启动MPP -> 制作视频 -> 发布 -> 汇总
+# Daily AI video pipeline controller.
+# Flow: preflight -> ensure MPP -> generate video -> QA -> optional publish -> summary.
 param(
     [string]$Date = (Get-Date).ToString("yyyyMMdd"),
-    [int]$VideoTimeoutMinutes = 30,    # 视频制作超时(分钟)
-    [int]$PublishTimeoutMinutes = 20,   # 发布超时(分钟)
-    [string]$LockFile = "d:\VoxCPM\VoxCPM-2.0.3\video-project\.pipeline.lock"
+    [int]$VideoTimeoutMinutes = 60,
+    [int]$PublishTimeoutMinutes = 30,
+    [string[]]$PublishPlatforms = @(),
+    [switch]$NoPublish,
+    [string]$LockFile = "D:\VoxCPM\VoxCPM-2.0.3\video-project\.pipeline.lock"
 )
 
 $ErrorActionPreference = "Continue"
-$VideoProject = "d:\VoxCPM\VoxCPM-2.0.3\video-project"
+$VideoProject = "D:\VoxCPM\VoxCPM-2.0.3\video-project"
 $DailyDir = "$VideoProject\daily\$Date"
 $LogFile = "$VideoProject\pipeline_$Date.log"
+$QaScript = "$VideoProject\qa_video.ps1"
+$AudioFile = "$DailyDir\narration\daily_$Date.wav"
+$MakeScript = "$VideoProject\make_daily_video.ps1"
+$PublishScript = "$VideoProject\publish_daily_video.ps1"
+$EnsureMppScript = "D:\VoxCPM\MediaPublishPlatform\MediaPublishPlatform\ensure_backend_running.ps1"
 
-function Write-Log($level, $message) {
+function Write-Log {
+    param([string]$Level, [string]$Message)
     $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-    $line = "[$timestamp] [$level] $message"
+    $line = "[$timestamp] [$Level] $Message"
     Add-Content -Path $LogFile -Value $line -Encoding UTF8
-    $colorMap = @{ "INFO" = "White"; "OK" = "Green"; "WARN" = "Yellow"; "ERROR" = "Red" }
-    Write-Host $line -ForegroundColor ($colorMap[$level] -as [System.ConsoleColor])
+    $colorMap = @{ INFO = "White"; OK = "Green"; WARN = "Yellow"; ERROR = "Red" }
+    Write-Host $line -ForegroundColor ($colorMap[$Level] -as [System.ConsoleColor])
 }
 
-# ========== 防重复执行 ==========
-Write-Log "INFO" "========== 每日流水线启动 =========="
-Write-Log "INFO" "日期: $Date"
+function Invoke-JobWithTimeout {
+    param(
+        [scriptblock]$ScriptBlock,
+        [object[]]$ArgumentList,
+        [int]$TimeoutSeconds,
+        [string]$Name
+    )
+    $job = Start-Job -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+    $job | Wait-Job -Timeout $TimeoutSeconds | Out-Null
+    if ($job.State -eq "Running") {
+        Stop-Job $job
+        Remove-Job $job
+        throw "$Name timed out after $TimeoutSeconds seconds"
+    }
+    $output = Receive-Job $job
+    $state = $job.State
+    Remove-Job $job
+    if ($state -ne "Completed") {
+        throw "$Name failed with job state: $state"
+    }
+    return $output
+}
+
+Write-Log "INFO" "========== Daily pipeline started =========="
+Write-Log "INFO" "Date: $Date"
 
 if (Test-Path $LockFile) {
     $lockAge = (Get-Date) - (Get-Item $LockFile).LastWriteTime
     if ($lockAge.TotalHours -lt 2) {
-        Write-Log "WARN" "检测到锁文件(创建于 $([math]::Round($lockAge.TotalMinutes,1)) 分钟前)，可能已有实例在运行，退出"
+        Write-Log "WARN" "Existing lock is recent ($([math]::Round($lockAge.TotalMinutes,1)) minutes); another run may be active."
         exit 0
-    } else {
-        Write-Log "WARN" "锁文件已过期($([math]::Round($lockAge.TotalHours,1)) 小时)，强制继续"
-        Remove-Item $LockFile -Force
     }
+    Write-Log "WARN" "Existing lock is stale ($([math]::Round($lockAge.TotalHours,1)) hours); replacing it."
+    Remove-Item -LiteralPath $LockFile -Force
 }
 
-# 创建锁文件
-"running" | Out-File -FilePath $LockFile -Force
-Write-Log "INFO" "锁文件已创建: $LockFile"
+"running" | Out-File -FilePath $LockFile -Force -Encoding UTF8
+Write-Log "INFO" "Lock created: $LockFile"
 
 try {
-    # ========== 步骤1: 环境预检 ==========
-    Write-Log "INFO" "[步骤1] 环境预检..."
+    Write-Log "INFO" "[1] Preflight..."
     & "$VideoProject\pre_flight_check.ps1"
     if ($LASTEXITCODE -eq 1) {
-        Write-Log "ERROR" "预检发现致命问题，中止任务"
-        exit 1
+        throw "Preflight found fatal issues"
     }
-    Write-Log "OK" "预检通过"
+    Write-Log "OK" "Preflight passed"
 
-    # ========== 步骤2: 启动 MediaPublishPlatform ==========
-    Write-Log "INFO" "[步骤2] 确保 MediaPublishPlatform 运行..."
+    Write-Log "INFO" "[2] Ensuring MediaPublishPlatform backend..."
+    if (Test-Path $EnsureMppScript) {
+        & powershell -NoProfile -ExecutionPolicy Bypass -File $EnsureMppScript
+    } else {
+        Write-Log "WARN" "MPP ensure script not found: $EnsureMppScript"
+    }
     try {
-        $mppCheck = Invoke-RestMethod -Uri "http://127.0.0.1:5409/getValidAccounts" -Method GET -TimeoutSec 5
-        Write-Log "OK" "MPP 后端已在运行"
+        Invoke-RestMethod -Uri "http://127.0.0.1:5409/getValidAccounts" -Method GET -TimeoutSec 5 | Out-Null
+        Write-Log "OK" "MPP backend reachable"
     } catch {
-        Write-Log "WARN" "MPP 后端未运行，尝试启动..."
-        Start-Process -FilePath "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\python.exe" `
-            -ArgumentList "D:\VoxCPM\MediaPublishPlatform\MediaPublishPlatform\sau_backend\sau_backend.py" `
-            -WindowStyle Hidden
-        Start-Sleep -Seconds 10
-        try {
-            $mppCheck = Invoke-RestMethod -Uri "http://127.0.0.1:5409/getValidAccounts" -Method GET -TimeoutSec 5
-            Write-Log "OK" "MPP 后端已启动"
-        } catch {
-            Write-Log "WARN" "MPP 后端启动失败或仍未就绪，发布步骤将跳过"
+        if (-not $NoPublish) {
+            Write-Log "WARN" "MPP backend unreachable; publish step will be skipped: $($_.Exception.Message)"
         }
     }
 
-    # ========== 步骤3: 制作视频(带超时) ==========
-    Write-Log "INFO" "[步骤3] 制作视频 (超时: ${VideoTimeoutMinutes}分钟)..."
-    $videoJob = Start-Job -ScriptBlock {
-        param($scriptPath, $date)
-        & $scriptPath -Date $date
-    } -ArgumentList "$VideoProject\make_daily_video.ps1", $Date
-
-    $videoJob | Wait-Job -Timeout ($VideoTimeoutMinutes * 60) | Out-Null
-    if ($videoJob.State -eq "Running") {
-        Write-Log "ERROR" "视频制作超时($VideoTimeoutMinutes 分钟)，强制终止"
-        Stop-Job $videoJob
-        Remove-Job $videoJob
-        exit 1
-    }
-
-    $videoResult = Receive-Job $videoJob
-    Remove-Job $videoJob
-    Write-Log "INFO" "视频制作输出:`n$videoResult"
+    Write-Log "INFO" "[3] Generating video..."
+    $videoOutput = Invoke-JobWithTimeout -Name "video generation" -TimeoutSeconds ($VideoTimeoutMinutes * 60) -ScriptBlock {
+        param($ScriptPath, $RunDate)
+        & powershell -NoProfile -ExecutionPolicy Bypass -File $ScriptPath -Date $RunDate
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    } -ArgumentList @($MakeScript, $Date)
+    Write-Log "INFO" "Video generation output:`n$videoOutput"
 
     $horizontalFile = "$DailyDir\daily_$Date.mp4"
+    $verticalFile = "$DailyDir\daily_${Date}_vertical.mp4"
     if (-not (Test-Path $horizontalFile)) {
-        Write-Log "ERROR" "视频制作失败，未找到输出文件: $horizontalFile"
-        exit 1
+        throw "Horizontal output not found: $horizontalFile"
     }
-    Write-Log "OK" "视频制作完成: $horizontalFile"
+    if (-not (Test-Path $AudioFile)) {
+        throw "Narration output not found: $AudioFile"
+    }
 
-    # ========== 步骤4: 发布视频(带超时) ==========
-    Write-Log "INFO" "[步骤4] 发布视频 (超时: ${PublishTimeoutMinutes}分钟)..."
-    try {
-        $mppCheck = Invoke-RestMethod -Uri "http://127.0.0.1:5409/getValidAccounts" -Method GET -TimeoutSec 5
-        $publishJob = Start-Job -ScriptBlock {
-            param($scriptPath, $date)
-            & $scriptPath -Date $date
-        } -ArgumentList "$VideoProject\publish_daily_video.ps1", $Date
-
-        $publishJob | Wait-Job -Timeout ($PublishTimeoutMinutes * 60) | Out-Null
-        if ($publishJob.State -eq "Running") {
-            Write-Log "WARN" "发布超时($PublishTimeoutMinutes 分钟)，强制终止"
-            Stop-Job $publishJob
-            Remove-Job $publishJob
-        } else {
-            $publishResult = Receive-Job $publishJob
-            Remove-Job $publishJob
-            Write-Log "INFO" "发布输出:`n$publishResult"
+    Write-Log "INFO" "[4] Final QA..."
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $QaScript -VideoFile $horizontalFile -AudioFile $AudioFile 2>&1 |
+        Tee-Object -FilePath ([System.IO.Path]::ChangeExtension($horizontalFile, ".pipeline.qa.log"))
+    if ($LASTEXITCODE -ne 0) {
+        throw "Horizontal video QA failed: $horizontalFile"
+    }
+    if (Test-Path $verticalFile) {
+        & powershell -NoProfile -ExecutionPolicy Bypass -File $QaScript -VideoFile $verticalFile -AudioFile $AudioFile 2>&1 |
+            Tee-Object -FilePath ([System.IO.Path]::ChangeExtension($verticalFile, ".pipeline.qa.log"))
+        if ($LASTEXITCODE -ne 0) {
+            throw "Vertical video QA failed: $verticalFile"
         }
-    } catch {
-        Write-Log "WARN" "发布步骤跳过: $_"
+    }
+    Write-Log "OK" "QA passed"
+
+    if ($NoPublish) {
+        Write-Log "INFO" "[5] Publish skipped by -NoPublish"
+    } else {
+        Write-Log "INFO" "[5] Publishing..."
+        try {
+            Invoke-RestMethod -Uri "http://127.0.0.1:5409/getValidAccounts" -Method GET -TimeoutSec 5 | Out-Null
+            $publishArgs = @($PublishScript, $Date, $PublishPlatforms)
+            $publishOutput = Invoke-JobWithTimeout -Name "publish" -TimeoutSeconds ($PublishTimeoutMinutes * 60) -ScriptBlock {
+                param($ScriptPath, $RunDate, $Platforms)
+                $args = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $ScriptPath, "-Date", $RunDate, "-DelaySeconds", "120")
+                if ($Platforms -and $Platforms.Count -gt 0) {
+                    $args += "-Platforms"
+                    $args += $Platforms
+                }
+                & powershell @args
+                if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            } -ArgumentList $publishArgs
+            Write-Log "INFO" "Publish output:`n$publishOutput"
+        } catch {
+            Write-Log "WARN" "Publish skipped or failed: $($_.Exception.Message)"
+        }
     }
 
-    # ========== 步骤5: 汇总 ==========
-    Write-Log "INFO" "[步骤5] 任务汇总..."
-    $files = Get-ChildItem -Path $DailyDir -Filter "*.mp4" | Select-Object Name, @{N="SizeMB";E={[math]::Round($_.Length/1MB,1)}}
-    foreach ($f in $files) {
-        Write-Log "OK" "产出文件: $($f.Name) ($($f.SizeMB) MB)"
+    Write-Log "INFO" "[6] Summary..."
+    $files = Get-ChildItem -Path $DailyDir -Filter "*.mp4" -ErrorAction SilentlyContinue |
+        Select-Object Name, @{N="SizeMB";E={[math]::Round($_.Length / 1MB, 1)}}
+    foreach ($file in $files) {
+        Write-Log "OK" "Output: $($file.Name) ($($file.SizeMB) MB)"
     }
 
     if (Test-Path "$DailyDir\publish_result.json") {
-        $pubResult = Get-Content "$DailyDir\publish_result.json" | ConvertFrom-Json
-        $success = ($pubResult | Where-Object { $_.Status -eq "成功" }).Count
-        $fail = ($pubResult | Where-Object { $_.Status -eq "失败" }).Count
-        Write-Log "OK" "发布结果: $success 成功, $fail 失败"
+        $publishResult = Get-Content "$DailyDir\publish_result.json" -Encoding UTF8 | ConvertFrom-Json
+        $success = @($publishResult | Where-Object { $_.Status -eq "SUCCESS" }).Count
+        $fail = @($publishResult | Where-Object { $_.Status -eq "FAIL" }).Count
+        $skip = @($publishResult | Where-Object { $_.Status -eq "SKIP" }).Count
+        Write-Log "OK" "Publish result: $success success, $fail failed, $skip skipped"
     }
 
-    Write-Log "INFO" "========== 流水线完成 =========="
+    Write-Log "INFO" "========== Daily pipeline completed =========="
     exit 0
-
 } catch {
-    Write-Log "ERROR" "流水线异常: $_"
+    Write-Log "ERROR" "Pipeline failed: $($_.Exception.Message)"
     exit 1
 } finally {
-    # 清理锁文件
     if (Test-Path $LockFile) {
-        Remove-Item $LockFile -Force
-        Write-Log "INFO" "锁文件已清理"
+        Remove-Item -LiteralPath $LockFile -Force
+        Write-Log "INFO" "Lock removed"
     }
 }

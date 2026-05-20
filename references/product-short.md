@@ -1,4 +1,4 @@
-# Product Promo And Partner Short Video
+﻿# Product Promo And Partner Short Video
 
 Use this reference for product, feature-introduction, launch, channel, reseller, source-supplier, business-opportunity, website, Douyin, Xiaohongshu, or WeChat Channels videos. Keep the workflow reusable for any product; do not bake one specific product prompt into the skill.
 
@@ -13,6 +13,8 @@ Duration target: 55-70 seconds
 Tone: premium launch film + data visualization
 Platforms: Douyin, Xiaohongshu, WeChat Channels, product website
 ```
+
+Build native 1080x1920 compositions for premium social output. Use horizontal-to-vertical padding only for quick derivatives, not for a first-class Douyin/Xiaohongshu/WeChat Channels video.
 
 The target feel:
 
@@ -176,8 +178,9 @@ compositions\
 Render QA:
 
 - `lint` passes.
-- `validate` passes.
+- `inspect` passes.
 - `inspect` passes.
 - Audio/video duration diff <= 0.2s.
 - `blackdetect` has no long black segments.
 - Sample frames show product, functions, proof/comparison, and the requested CTA.
+

@@ -32,51 +32,82 @@ Use these paths as the canonical local environment:
 | Anime.js asset guide | `D:\VoxCPM\anime-master\VIDEO_ASSETS_GUIDE.md` |
 | One-click script | `D:\VoxCPM\VoxCPM-2.0.3\video-project\make_daily_video.ps1` |
 
-## Core Workflow
+Treat `D:\VoxCPM\VoxCPM-2.0.3\video-project\` as the canonical runtime. The skill folder may contain bundled/reference copies of scripts; do not run or patch those copies when the task is to fix the live generator unless the user explicitly asks to update the skill bundle.
 
-### For Daily AI HOT News Videos (Fully Automated)
+## Workflow Router
 
-When the user asks for "today's AI news video", "make daily AI HOT", "generate today's video", or similar:
+Choose exactly one route before doing work:
+
+| Request | Route | Required action |
+| --- | --- | --- |
+| "today's AI news video", "make daily AI HOT", "generate today's video" with no custom art direction | Automated Daily AI HOT | Run the canonical one-click script, then verify/report QA outputs. Do not manually rebuild scenes. |
+| AI HOT/news video with custom story, style, repair, or manual editorial changes | Manual AI News | Fetch AI HOT data, build script/timing, author or repair HyperFrames manually, then run full QA. |
+| Product, feature, launch, partner/channel, website, Douyin/Xiaohongshu/WeChat short | Product/Promo | Use `references/product-short.md`, `web-research.md`, `art-direction.md`, and true aspect-ratio-specific composition. |
+| Black screen, desync, broken render, missing assets, ugly draft | Repair/QA | Inspect the existing project first, then use `black-screen-debug.md`, `sync.md`, `audio-segmentation.md`, and QA commands. |
+
+Do not mix routes. For example, an automated daily video does not need a manual source log, but a product or custom promo must perform web research and source logging before making claims.
+
+### Automated Daily AI HOT
+
+When the user asks for the fully automated daily news video:
 
 1. **Directly run the fully automated one-click script**:
    ```powershell
    cd D:\VoxCPM\VoxCPM-2.0.3\video-project
    .\make_daily_video.ps1
    ```
-2. The script handles **everything end-to-end**:
+2. The script handles the generation chain:
    - Fetches 10 AI HOT news items automatically
    - Writes a natural narration script with random openings/closings
-   - Generates VoxCPM narration locally
-   - Measures audio duration and allocates scene timing
-   - Generates HTML compositions (AI dynamic layout if `ai_config.json` is configured, else fallback to template)
    - Playwright automatically captures screenshots for all news with retry
-   - Runs HyperFrames lint and validation
-   - Renders video with automatic retry and black screen detection
+   - Generates VoxCPM narration locally in short segments, then joins them with FFmpeg
+   - Measures every audio segment and passes real per-scene timing to HyperFrames
+   - Generates HTML compositions (AI dynamic layout if `ai_config.json` is configured, else fallback to template)
+   - Runs HyperFrames lint and inspection
+   - Renders video with automatic retry
+   - Runs `qa_video.ps1` for audio/video duration and black-screen checks
    - Copies final MP4 to unified output folder `D:\VoxCPM\VoxCPM-2.0.3\video-project\output\`
-   - Generates vertical 9:16 version if horizontal succeeds
-3. After script completes, report the output location and confirm success.
-4. Do **NOT** manually repeat steps that the script already automates.
+   - Generates a quick vertical derivative if horizontal succeeds
+3. Optional publish step:
+   - Use `publish_daily_video.ps1 -Date YYYYMMDD -Platforms douyin` only after QA passes.
+   - `accountList` must contain the MPP cookie filename such as `douyin_cookie_宇航.json`, not the display name such as `宇航`.
+   - Tags must be whole tags without leading `#`, comma-separated or passed as an array, for example `AI日报,人工智能,大模型`. Do not pass a plain string to code that iterates tags character-by-character.
+   - For the full automated controller, use `run_daily_pipeline.ps1 -Date YYYYMMDD -PublishPlatforms douyin` or add `-NoPublish` for generation-only runs.
+4. After script completes, report the output location, QA result, publish result, and any failed logs.
+5. Do **NOT** manually repeat steps that the script already automates.
 
-### For Custom Product/Promo Videos (Manual)
+### Manual AI News Or Custom Product/Promo
 
 1. Run real web research for the product/news/topic, competitors, and usable visual references.
 2. Save a source log with URLs, dates, claims, and asset candidates.
 3. Fetch AI HOT items when the video contains AI news.
 4. Select the strongest claims or product selling points.
 5. Write a short narration script with scene blocks.
-6. Generate VoxCPM narration locally.
-7. Measure narration duration and create a timing plan before writing scene HTML.
+6. Generate VoxCPM narration locally; split long scripts into short segments and join with FFmpeg.
+7. Measure each narration segment and create a timing plan before writing scene HTML.
 8. Build a visual direction using `references/art-direction.md`.
 9. Pick a visual concept that differs from recent outputs.
 10. Build or update a HyperFrames project under `daily\YYYYMMDD` or a product-specific folder.
 11. Add scenes and approved web/local/Anime.js assets.
-12. Run `npx hyperframes lint`, `validate`, and `inspect`.
+12. Run `npx hyperframes lint` and `inspect`.
 13. Render a draft MP4, test sync/black frames/sample frames, then render standard/high quality.
 14. Run an aesthetic review on extracted frames; revise if the video looks cheap, generic, or PPT-like.
 
+For manual AI HOT data, use the dated archive first when the user wants a specific day. Use the recent-items endpoint only for "today" style runs:
+
+```powershell
+$UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 aihot-skill/0.2.0"
+$archiveUrl = "https://aihot.virxact.com/api/public/daily/YYYY-MM-DD"
+$since = (Get-Date).ToUniversalTime().AddHours(-24).ToString("yyyy-MM-ddTHH:mm:ssZ")
+$recentUrl = "https://aihot.virxact.com/api/public/items?mode=selected&since=$since&take=10"
+$headers = @{"User-Agent"=$UA}
+$daily = Invoke-RestMethod -Uri $archiveUrl -Headers $headers -Method Get
+$daily.sections | ForEach-Object { $_.items } | Select-Object title, sourceName, sourceUrl, summary | ConvertTo-Json -Depth 3
+```
+
 ## Mandatory Web Research
 
-For every new video, perform real network research before writing the script or selecting visuals. Read `references/web-research.md` for the required process. Do not rely only on memory.
+For every manual, product, promo, partner, or custom video, perform real network research before writing the script or selecting visuals. Read `references/web-research.md` for the required process. Do not rely only on memory.
 
 Use web research for:
 
@@ -105,7 +136,7 @@ Assets used:
 Assets rejected:
 ```
 
-**Exception for Daily AI HOT News:** The `make_daily_video.ps1` script already fetches AI HOT items and captures screenshots automatically. You don't need to manually create a source log for fully automated daily news.
+**Exception for Automated Daily AI HOT:** The `make_daily_video.ps1` script already fetches AI HOT items and captures screenshots automatically. Do not manually create a source log for the fully automated route unless the user asks for an editorial or research-backed custom version.
 
 If network access fails, state that research could not be completed and stop before making competitive claims.
 
@@ -117,22 +148,12 @@ Default product short requirements:
 
 - Use actual web research for product and competitors.
 - Make the video 9:16 unless the user asks otherwise.
+- Build true 1080x1920 vertical compositions for premium social output; do not rely on a padded 16:9 derivative unless the user asks for a quick adaptation.
 - Aim for about 55-70 seconds.
 - Use a premium launch-film direction: Apple keynote clarity, Google I/O energy, Bloomberg-style data visualization.
 - Avoid PPT-like slide decks, cheap templates, generic stock backgrounds, and repetitive card-only layouts.
 - Show product function, proof, competitor contrast, and the business opportunity when relevant.
 - End with a clear CTA for the intended audience: buyer, user, partner, channel, reseller, or website lead.
-
-For AI HOT data, use:
-
-```powershell
-$UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 aihot-skill/0.2.0"
-$since = (Get-Date).ToUniversalTime().AddHours(-24).ToString("yyyy-MM-ddTHH:mm:ssZ")
-$url = "https://aihot.virxact.com/api/public/items?mode=selected&since=$since&take=10"
-$headers = @{"User-Agent"=$UA}
-$response = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
-$response.items | Select-Object title, source, publishedAt, url, summary | ConvertTo-Json -Depth 3
-```
 
 ## Project Structure
 
@@ -157,7 +178,7 @@ Use one static composition file per news card when reliability matters. Avoid re
 
 ## Audio/Video Sync
 
-Treat audio/video sync as a release blocker. Read `references/sync.md` before creating or repairing a full video with narration.
+Treat audio/video sync as a release blocker. Read `references/sync.md` before creating or repairing a full video with narration. If narration is long or develops electronic artifacts, read `references/audio-segmentation.md` and prefer segmented TTS plus one joined WAV.
 
 Core rules:
 
@@ -241,7 +262,15 @@ Reject outputs that look like:
 
 ## Composition Rules
 
-Write each composition as a full HTML document:
+Set dimensions from the chosen route:
+
+| Route | Root size | Notes |
+| --- | --- | --- |
+| Daily AI HOT landscape | `1920x1080` | Canonical daily format. The script may create a quick vertical derivative after the landscape render. |
+| Product/promo/social vertical | `1080x1920` | Build native vertical compositions. Do not design in 16:9 and pad to 9:16 for premium social work. |
+| User-specified size | requested size | Keep every root and child composition on the same dimensions. |
+
+Write each composition as a full HTML document using the selected dimensions:
 
 ```html
 <!DOCTYPE html>
@@ -272,6 +301,7 @@ Follow these hard rules:
 - Do not use `repeat: -1`; calculate finite repeats if looping is necessary.
 - Keep assets inside the current project folder or a subfolder. HyperFrames will not reliably serve `../../` paths.
 - Put narration for a daily project under `daily\YYYYMMDD\narration\`.
+- Use `1080x1920` in every root and child composition for true social vertical videos.
 
 ## Visual Style
 
@@ -328,13 +358,17 @@ Run these checks before handing off:
 ```powershell
 cd D:\VoxCPM\VoxCPM-2.0.3\video-project\daily\YYYYMMDD
 npx hyperframes lint
-npx hyperframes validate
 npx hyperframes inspect
 npx hyperframes render --output daily_YYYYMMDD_draft.mp4 --fps 30 --quality draft
-ffmpeg -hide_banner -i daily_YYYYMMDD_draft.mp4 -vf blackdetect=d=0.5:pic_th=0.98 -an -f null -
-ffprobe -v error -show_entries format=duration -of default=nk=1:nw=1 daily_YYYYMMDD_draft.mp4
+powershell -NoProfile -ExecutionPolicy Bypass -File ..\..\qa_video.ps1 -VideoFile .\daily_YYYYMMDD_draft.mp4 -AudioFile .\narration\daily_YYYYMMDD.wav -MaxDurationDeltaSeconds 0.2
 npx hyperframes render --output daily_YYYYMMDD.mp4 --fps 30 --quality standard
+powershell -NoProfile -ExecutionPolicy Bypass -File ..\..\qa_video.ps1 -VideoFile .\daily_YYYYMMDD.mp4 -AudioFile .\narration\daily_YYYYMMDD.wav -MaxDurationDeltaSeconds 0.2
 ```
+
+If `qa_video.ps1` is unavailable, run `ffmpeg blackdetect` and compare audio/video durations with `ffprobe` manually. A file that merely has a duration longer than 3 seconds is not a valid black-screen check.
+
+If VoxCPM TTS fails with Windows `os error 1455`, treat it as a memory/pagefile issue first: close browsers/video apps, then retry after raising the Windows paging file to at least 32 GB or enabling system-managed virtual memory.
+Before loading VoxCPM, check that free virtual memory is comfortably above the low-teens GB range; if it is not, stop early and fix the machine instead of burning time on a doomed TTS attempt.
 
 Extract sample frames when debugging:
 
@@ -348,7 +382,7 @@ ffmpeg -y -ss 85 -i daily_YYYYMMDD.mp4 -frames:v 1 -update 1 sample_85s.png
 
 When a rendered video is black or nearly black, read `references/black-screen-debug.md` and follow it exactly. The proven order is:
 
-1. Run `npx hyperframes lint --json`, `validate --json`, and `inspect --json`.
+1. Run `npx hyperframes lint --json` and `inspect --json`.
 2. Check all media 404s, especially audio outside the project folder.
 3. Search for malformed HTML: broken quotes, broken JSON in `data-variable-values`, broken closing tags.
 4. Check composition identity: host `data-composition-id`, child root `data-composition-id`, and `window.__timelines[...]`.
@@ -367,6 +401,8 @@ cd D:\VoxCPM\VoxCPM-2.0.3\video-project
 .\make_daily_video.ps1
 ```
 
+Run and patch this canonical script, not the skill-bundled `video-project\make_daily_video.ps1` snapshot, when fixing the live generator.
+
 Ensure the script copies generated narration into the daily project folder before rendering:
 
 ```powershell
@@ -384,5 +420,6 @@ Copy-Item -LiteralPath $outputWav -Destination "$dailyNarrationDir\daily_$Date.w
 - `references/web-research.md` - Required real web research, competitor scan, and source logging.
 - `references/product-short.md` - 9:16 product promo, feature-introduction, partner, and channel short-video workflow.
 - `references/sync.md` - Audio/video timing, scene allocation, and sync QA.
+- `references/audio-segmentation.md` - Split long VoxCPM narration into short generated segments, join WAV, and preserve exact scene timing.
 - `references/variation.md` - Non-repetitive visual direction and variation system.
 - `references/black-screen-debug.md` - Reproducible black-screen diagnosis and repair workflow.

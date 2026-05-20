@@ -1,4 +1,4 @@
-# Black-Screen Debugging Playbook
+﻿# Black-Screen Debugging Playbook
 
 Use this reference when a VoxCPM/HyperFrames render is black, nearly black, missing text, or only shows tiny leftover elements.
 
@@ -6,7 +6,7 @@ Use this reference when a VoxCPM/HyperFrames render is black, nearly black, miss
 
 Do not guess. Use three evidence streams:
 
-1. HyperFrames validation: lint, validate, inspect.
+1. HyperFrames validation: lint and inspect.
 2. Rendered-video black-frame detection with FFmpeg.
 3. Actual screenshots extracted from the MP4.
 
@@ -17,7 +17,6 @@ Run from the daily project directory:
 ```powershell
 cd D:\VoxCPM\VoxCPM-2.0.3\video-project\daily\YYYYMMDD
 npx hyperframes lint --json
-npx hyperframes validate --json
 npx hyperframes inspect --json
 ```
 
@@ -45,7 +44,7 @@ ffmpeg -y -ss 85 -i daily_YYYYMMDD_debug.mp4 -frames:v 1 -update 1 sample_85s.pn
 
 ### 1. Media 404
 
-Check `validate --json` for messages like:
+Check `lint --json` / `inspect --json` for messages like:
 
 ```text
 404 loading narration/daily_YYYYMMDD.wav
@@ -166,7 +165,7 @@ Symptoms:
 
 - Rendered `daily_20260512.mp4` was black from about 2.12s to 80.32s.
 - Mid-video screenshot showed only a small “AI HOT 精选” tag.
-- `validate` reported `404 loading narration/daily_20260512.wav`.
+- `inspect` reported `404 loading narration/daily_20260512.wav`.
 
 Root causes:
 
@@ -187,14 +186,14 @@ Repair:
    - `news-item-4.html`
 4. Make each host id, child root id, and timeline key match.
 5. Replace entrance tweens with `fromTo()`.
-6. Run `lint`, `validate`, `inspect`.
+6. Run `lint`, `inspect`, `inspect`.
 7. Render draft and run `blackdetect`.
 8. Render standard output.
 
 Success criteria:
 
 - `npx hyperframes lint --json` has `errorCount: 0`.
-- `npx hyperframes validate --json` has no errors and no contrast failures.
 - `npx hyperframes inspect --json` has `ok: true`.
 - `ffmpeg blackdetect` prints no long `black_start` / `black_end` segments.
 - Sample frames at intro, middle, and outro visibly contain expected text and background.
+

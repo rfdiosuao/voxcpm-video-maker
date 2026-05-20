@@ -1,4 +1,4 @@
-# VoxCPM Video Maker
+﻿# VoxCPM Video Maker
 
 > AI 新闻视频全自动制作工具 — 从资讯采集到成片渲染，一条命令搞定。
 
@@ -29,7 +29,7 @@
 | **五种视觉路线** | 每天自动切换风格，告别千篇一律 |
 | **Anime.js 特效库** | 粒子星场、线条绘制、打字机等 6+ 种视觉资产 |
 | **音画精确同步** | 误差 < 0.2 秒，基于实际音频时长动态分配场景 |
-| **黑屏诊断流程** | 七步定位法：lint → validate → inspect → blackdetect |
+| **黑屏诊断流程** | 七步定位法：lint → inspect → blackdetect → sample frames |
 | **一键自动化** | PowerShell 脚本全链路：资讯 → 旁白 → 合成 → 渲染 → QA |
 
 ---
@@ -224,7 +224,6 @@ video-project/
 ```powershell
 cd video-project\daily\YYYYMMDD
 npx hyperframes lint
-npx hyperframes validate
 npx hyperframes inspect
 npx hyperframes render --output draft.mp4 --fps 30 --quality draft
 
@@ -293,3 +292,4 @@ MIT License
 <p align="center">
   Made with ❤️ by <a href="https://www.trae.ai/">Trae SOLO</a> · <a href="https://github.com/rfdiosuao/voxcpm-video-maker">VoxCPM Video Maker</a>
 </p>
+
