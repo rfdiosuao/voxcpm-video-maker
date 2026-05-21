@@ -168,6 +168,39 @@ function Convert-AiHotDailyArchiveToItems {
     return @($items)
 }
 
+function Read-AiHotItemsFromFile {
+    param([Parameter(Mandatory=$true)][string]$Path)
+
+    $items = @(Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json |
+        Where-Object { $_ -and $_.title } |
+        Select-Object -First 10)
+    if ($items.Count -eq 0) {
+        throw "缓存资讯文件为空: $Path"
+    }
+    return $items
+}
+
+function Find-AiHotCacheFile {
+    param(
+        [Parameter(Mandatory=$true)][string]$PreferredPath,
+        [Parameter(Mandatory=$true)][string]$DailyRoot
+    )
+
+    if (Test-Path $PreferredPath) {
+        return $PreferredPath
+    }
+
+    $candidate = Get-ChildItem -LiteralPath $DailyRoot -Recurse -Filter "aihot_items.json" -ErrorAction SilentlyContinue |
+        Where-Object { $_.Length -gt 10 } |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    if ($candidate) {
+        return $candidate.FullName
+    }
+    return $null
+}
+
 function Split-VoiceText {
     param(
         [Parameter(Mandatory=$true)][string]$Text,
@@ -238,14 +271,8 @@ if (-not (Test-Path $NarrationDir)) { New-Item -ItemType Directory -Force -Path 
 if (Test-Path "$DailyDir\compositions") { Remove-Item "$DailyDir\compositions\*" -Force -ErrorAction SilentlyContinue }
 else { New-Item -ItemType Directory -Force -Path "$DailyDir\compositions" | Out-Null }
 $staleArtifacts = @(
-    "$DailyDir\daily_$Date.mp4",
-    "$DailyDir\daily_${Date}_draft.mp4",
-    "$DailyDir\daily_${Date}_vertical.mp4",
     "$DailyDir\narration\daily_$Date.wav",
-    "$VideoProject\narration\daily_$Date.wav",
-    "$OutputRoot\daily_$Date.mp4",
-    "$OutputRoot\daily_${Date}_draft.mp4",
-    "$OutputRoot\daily_${Date}_vertical.mp4"
+    "$VideoProject\narration\daily_$Date.wav"
 )
 foreach ($artifact in $staleArtifacts) {
     Remove-Item -LiteralPath $artifact -Force -ErrorAction SilentlyContinue
@@ -256,6 +283,7 @@ Write-Host "`n[步骤1] 获取 $Date AI资讯..." -ForegroundColor Yellow
 $UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 aihot-skill/0.2.0"
 $targetDay = $RunDate.ToString("yyyy-MM-dd")
 $archiveUrl = "https://aihot.virxact.com/api/public/daily/$targetDay"
+$cachedAiHotFile = "$DailyDir\aihot_items.json"
 
 $handler = $null
 $client = $null
@@ -304,8 +332,21 @@ try {
     Write-Host "  获取到 $($newsItems.Count) 条资讯" -ForegroundColor Green
     $newsItems | ConvertTo-Json -Depth 5 | Out-File -FilePath "$DailyDir\aihot_items.json" -Encoding UTF8
 } catch {
-    Write-Host "  错误: 无法获取AI资讯 - $_" -ForegroundColor Red
-    exit 1
+    $fallbackAiHotFile = Find-AiHotCacheFile -PreferredPath $cachedAiHotFile -DailyRoot "$VideoProject\daily"
+    if ($fallbackAiHotFile) {
+        try {
+            $newsItems = @(Read-AiHotItemsFromFile -Path $fallbackAiHotFile)
+            Write-Host "  警告: 在线获取失败，改用缓存资讯文件: $fallbackAiHotFile" -ForegroundColor Yellow
+            Write-Host "  从缓存读取到 $($newsItems.Count) 条资讯" -ForegroundColor Green
+            $newsItems | ConvertTo-Json -Depth 5 | Out-File -FilePath "$DailyDir\aihot_items.json" -Encoding UTF8
+        } catch {
+            Write-Host "  错误: 无法获取AI资讯，且缓存不可用 - $_" -ForegroundColor Red
+            exit 1
+        }
+    } else {
+        Write-Host "  错误: 无法获取AI资讯 - $_" -ForegroundColor Red
+        exit 1
+    }
 } finally {
     if ($client) { $client.Dispose() }
     if ($handler) { $handler.Dispose() }

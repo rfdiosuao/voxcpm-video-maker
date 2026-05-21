@@ -53,6 +53,7 @@ function Invoke-JobWithTimeout {
 
 Write-Log "INFO" "========== Daily pipeline started =========="
 Write-Log "INFO" "Date: $Date"
+$pipelineStartedAt = Get-Date
 
 if (Test-Path $LockFile) {
     $lockAge = (Get-Date) - (Get-Item $LockFile).LastWriteTime
@@ -82,7 +83,7 @@ try {
         Write-Log "WARN" "MPP ensure script not found: $EnsureMppScript"
     }
     try {
-        Invoke-RestMethod -Uri "http://127.0.0.1:5409/getValidAccounts" -Method GET -TimeoutSec 5 | Out-Null
+        Invoke-RestMethod -Uri "http://127.0.0.1:5409/getValidAccounts" -Method GET -TimeoutSec 20 | Out-Null
         Write-Log "OK" "MPP backend reachable"
     } catch {
         if (-not $NoPublish) {
@@ -103,8 +104,16 @@ try {
     if (-not (Test-Path $horizontalFile)) {
         throw "Horizontal output not found: $horizontalFile"
     }
+    $horizontalItem = Get-Item -LiteralPath $horizontalFile
+    if ($horizontalItem.LastWriteTime -lt $pipelineStartedAt) {
+        throw "Horizontal output is older than this pipeline run: $horizontalFile"
+    }
     if (-not (Test-Path $AudioFile)) {
         throw "Narration output not found: $AudioFile"
+    }
+    $audioItem = Get-Item -LiteralPath $AudioFile
+    if ($audioItem.LastWriteTime -lt $pipelineStartedAt) {
+        throw "Narration output is older than this pipeline run: $AudioFile"
     }
 
     Write-Log "INFO" "[4] Final QA..."
@@ -127,7 +136,7 @@ try {
     } else {
         Write-Log "INFO" "[5] Publishing..."
         try {
-            Invoke-RestMethod -Uri "http://127.0.0.1:5409/getValidAccounts" -Method GET -TimeoutSec 5 | Out-Null
+            Invoke-RestMethod -Uri "http://127.0.0.1:5409/getValidAccounts" -Method GET -TimeoutSec 20 | Out-Null
             $publishArgs = @($PublishScript, $Date, $PublishPlatforms)
             $publishOutput = Invoke-JobWithTimeout -Name "publish" -TimeoutSeconds ($PublishTimeoutMinutes * 60) -ScriptBlock {
                 param($ScriptPath, $RunDate, $Platforms)

@@ -31,10 +31,17 @@ Write-Host ""
 Write-Host "[检查1/7] 磁盘空间..." -ForegroundColor Yellow
 $drives = Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Root -match "^[A-Z]:\\$" }
 foreach ($drive in $drives) {
-    $freeGB = [math]::Round($drive.Free / 1GB, 1)
-    $totalGB = [math]::Round(($drive.Free + $drive.Used) / 1GB, 1)
-    $pct = [math]::Round(($drive.Free / ($drive.Free + $drive.Used)) * 100, 1)
     $label = $drive.Name + ":"
+    $freeBytes = if ($null -ne $drive.Free) { [double]$drive.Free } else { 0.0 }
+    $usedBytes = if ($null -ne $drive.Used) { [double]$drive.Used } else { 0.0 }
+    $totalBytes = $freeBytes + $usedBytes
+    if ($totalBytes -le 0) {
+        Write-Check "WARN" "$label 容量信息不可用，跳过空间阈值检查"
+        continue
+    }
+    $freeGB = [math]::Round($freeBytes / 1GB, 1)
+    $totalGB = [math]::Round($totalBytes / 1GB, 1)
+    $pct = [math]::Round(($freeBytes / $totalBytes) * 100, 1)
     if ($label -eq "C:") {
         if ($freeGB -lt $MinFreeGB) {
             Write-Check "FAIL" "$label 仅剩 ${freeGB}GB / ${totalGB}GB (${pct}% 可用)，低于阈值 ${MinFreeGB}GB"
