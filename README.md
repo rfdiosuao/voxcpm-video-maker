@@ -6,6 +6,8 @@
 
 [在线演示视频](https://github.com/rfdiosuao/voxcpm-video-maker/blob/master/assets/daily_20260513.mp4)
 
+[中文](README.md) | [English](README.en.md)
+
 ---
 
 ## 成功案例
